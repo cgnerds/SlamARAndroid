@@ -1,0 +1,38 @@
+
+{
+	"buildFiles" : [ "D:/Source/AndroidTest/AndroidCV/SlamARAndroid/app/CMakeLists.txt" ],
+	"cleanCommands" : 
+	[
+		"D:\\Source\\AndoridSDK\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\Source\\AndroidTest\\AndroidCV\\SlamARAndroid\\app\\.externalNativeBuild\\cmake\\debug\\x86 --target clean"
+	],
+	"cppFileExtensions" : [ "cpp" ],
+	"libraries" : 
+	{
+		"native-lib-Debug-x86" : 
+		{
+			"abi" : "x86",
+			"artifactName" : "native-lib",
+			"buildCommand" : "D:\\Source\\AndoridSDK\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\Source\\AndroidTest\\AndroidCV\\SlamARAndroid\\app\\.externalNativeBuild\\cmake\\debug\\x86 --target native-lib",
+			"buildType" : "debug",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  --target=i686-none-linux-android --gcc-toolchain=D:/Source/AndoridSDK/ndk-bundle/toolchains/x86-4.9/prebuilt/windows-x86_64 --sysroot=D:/Source/AndoridSDK/ndk-bundle/sysroot  -Dnative_lib_EXPORTS -isystem D:\\Source\\AndoridSDK\\ndk-bundle\\sources\\cxx-stl\\gnu-libstdc++\\4.9\\include -isystem D:\\Source\\AndoridSDK\\ndk-bundle\\sources\\cxx-stl\\gnu-libstdc++\\4.9\\libs\\x86\\include -isystem D:\\Source\\AndoridSDK\\ndk-bundle\\sources\\cxx-stl\\gnu-libstdc++\\4.9\\include\\backward  -isystem D:/Source/AndoridSDK/ndk-bundle/sysroot/usr/include/i686-linux-android -D__ANDROID_API__=23 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -Wa,--noexecstack -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "D:/Source/AndroidTest/AndroidCV/SlamARAndroid/app/src/main/cpp/native-lib.cpp",
+					"workingDirectory" : "D:/Source/AndroidTest/AndroidCV/SlamARAndroid/app/.externalNativeBuild/cmake/debug/x86"
+				}
+			],
+			"output" : "D:/Source/AndroidTest/AndroidCV/SlamARAndroid/app/build/intermediates/cmake/debug/obj/x86/libnative-lib.so",
+			"toolchain" : "3699127913"
+		}
+	},
+	"toolchains" : 
+	{
+		"3699127913" : 
+		{
+			"cCompilerExecutable" : "D:/Source/AndoridSDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
+			"cppCompilerExecutable" : "D:/Source/AndoridSDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+		}
+	}
+}

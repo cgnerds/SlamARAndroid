@@ -1,0 +1,15 @@
+Executable : D:\Source\AndoridSDK\cmake\3.6.4111459\bin\cmake.exe
+arguments : 
+-HD:\Source\AndroidTest\AndroidCV\SlamARAndroid\app
+-BD:\Source\AndroidTest\AndroidCV\SlamARAndroid\app\.externalNativeBuild\cmake\release\mips64
+-GAndroid Gradle - Ninja
+-DANDROID_ABI=mips64
+-DANDROID_NDK=D:\Source\AndoridSDK\ndk-bundle
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=D:\Source\AndroidTest\AndroidCV\SlamARAndroid\app\build\intermediates\cmake\release\obj\mips64
+-DCMAKE_BUILD_TYPE=Release
+-DCMAKE_MAKE_PROGRAM=D:\Source\AndoridSDK\cmake\3.6.4111459\bin\ninja.exe
+-DCMAKE_TOOLCHAIN_FILE=D:\Source\AndoridSDK\ndk-bundle\build\cmake\android.toolchain.cmake
+-DANDROID_PLATFORM=android-23
+-DCMAKE_CXX_FLAGS=
+jvmArgs : 
+
