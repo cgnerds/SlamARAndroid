@@ -1,0 +1,12 @@
+machine:
+  java:
+    version: oraclejdk8
+  environment:
+    ANDROID_HOME: /user/local/android-sdk-linux
+    
+override:
+  - echo y | android update sdk --no-ui --filter "android-26"
+  - echo y | android update sdk --no-ui --filter "build-tools-26.0.0"
+test:
+  override:
+    - echo "test"
