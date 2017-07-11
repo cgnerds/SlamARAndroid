@@ -1,3 +1,0 @@
-D:/Source/SlamARAndroid/app/.externalNativeBuild/cmake/release/armeabi-v7a/CMakeFiles/native-lib.dir
-D:/Source/SlamARAndroid/app/.externalNativeBuild/cmake/release/armeabi-v7a/CMakeFiles/edit_cache.dir
-D:/Source/SlamARAndroid/app/.externalNativeBuild/cmake/release/armeabi-v7a/CMakeFiles/rebuild_cache.dir
