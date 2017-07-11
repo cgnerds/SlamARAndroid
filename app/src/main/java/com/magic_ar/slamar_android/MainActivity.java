@@ -1,10 +1,8 @@
 package com.magic_ar.slamar_android;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -13,17 +11,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import java.util.HashMap;
-import java.util.List;
 
+/*
+ *  [Android Development with OpenCV](http://docs.opencv.org/2.4/doc/tutorials/introduction/android_binary_package/dev_with_OCV_on_Android.html)
+ */
 @SuppressWarnings("deprecation")
 public class MainActivity extends AppCompatActivity
         implements CameraBridgeViewBase.CvCameraViewListener2 {
@@ -39,9 +39,7 @@ public class MainActivity extends AppCompatActivity
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                     Log.d(TAG, "OpenCV loaded successfully");
-                    if(mCameraView != null) {
-                        mCameraView.enableView();
-                    }
+                    mCameraView.enableView();
                     break;
                 default:
                     super.onManagerConnected(status);
@@ -53,15 +51,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.activity_main);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // Load the OpenCV package first.
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
 
+        mCameraView = (CameraBridgeViewBase) findViewById(R.id.openCvView);
         requestCameraPermission(new PermissionCallback() {
             @Override
             public void onSuccess() {
-                setContentView(R.layout.activity_main);
-                mCameraView = (CameraBridgeViewBase) findViewById(R.id.openCvView);
                 mCameraView.setVisibility(SurfaceView.VISIBLE);
                 mCameraView.setCvCameraViewListener(MainActivity.this);
             }
@@ -115,25 +113,38 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onPause() {
-        if(mCameraView != null) {
-            mCameraView.disableView();;
-        }
-        super.onPause();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        if(mCameraView != null) {
+            mCameraView.disableView();;
+        }
+    }
+
+    @Override
     public void onDestroy() {
+        super.onDestroy();
         if(mCameraView != null) {
             mCameraView.disableView();
         }
-        super.onDestroy();
+    }
+
+    @Override
+    public void onCameraViewStarted(int width, int height) {
+    }
+
+    @Override
+    public void onCameraViewStopped() {
+    }
+
+    @Override
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        return inputFrame.rgba();
     }
 
     @Override
@@ -149,18 +160,5 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onCameraViewStarted(int width, int height) {
-    }
-
-    @Override
-    public void onCameraViewStopped() {
-    }
-
-    @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        return inputFrame.rgba();
     }
 }
