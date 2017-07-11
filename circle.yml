@@ -1,21 +1,29 @@
+general:
+    artifacts:
+        - /home/ubuntu/AndroidApp/app/build/outputs/apk/
+        
 machine:
   java:
     version: oraclejdk8
   environment:
     ANDROID_HOME: /user/local/android-sdk-linux
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+    _JAVA_OPTIONS: "-Xms512m -Xmx1024m"
 
 dependencies:
-  override:
+  pre:
     - echo y | android update sdk --no-ui --filter "android-26"
     - echo y | android update sdk --no-ui --filter "build-tools-26.0.0"
     - echo y | android update sdk --no-ui --filter "extra-android-m2repository"
     - echo y | android update sdk --no-ui --filter "extra-android-support"
     - echo y | android update sdk --no-ui --filter "extra-google-m2repositor"
     - ./gradlew dependencies || true
-
-test:
   override:
-    - echo "test"
-  post:
-    - echo "post"
-#    - cp -R ./SlamARAndroid/build/apk $CIRCLE_ARTIFACTS
+    - chmod +x gradlew
+    - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
+test:
+    override:
+        - (./gradlew assemble):
+            timeout: 360
+        # copy the build outputs to artifacts
+        - cp -r app/build/outputs $CIRCLE_ARTIFACTS 
