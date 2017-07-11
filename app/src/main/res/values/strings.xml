@@ -14,5 +14,8 @@
     <string name="photo_send_extra_subject">My photo from SlamAR-Android</string>
     <string name="photo_send_extra_text">Check out my photo from the SlamAR-Android app! </string>
     <string name="share">Share</string>
-
+    <string name="help">Help</string>
+    <string name="string_help_text">The appliaction needs necessary permissions.</string>
+    <string name="quit">Quit</string>
+    <string name="settings">Settings</string>
 </resources>

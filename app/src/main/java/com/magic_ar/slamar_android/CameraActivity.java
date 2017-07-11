@@ -37,19 +37,14 @@ import java.io.File;
 import java.security.Policy;
 import java.util.List;
 
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
+
 // Use the deprecated Camera class.
 @SuppressWarnings("deprecation")
+@RuntimePermissions
 public class CameraActivity extends AppCompatActivity
-  implements CameraBridgeViewBase.CvCameraViewListener2 {
-
-    // Permissions
-    private static final int REQUEST_CODE = 0;
-    static final String[] PERMISSIONS = new String[] {
-            Manifest.permission.CAMERA,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
-    // private PermissionChecker permissionChecker;
-
+        implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     // A tag for log output.
     private static final String TAG = CameraActivity.class.getSimpleName();
@@ -120,14 +115,10 @@ public class CameraActivity extends AppCompatActivity
             mCameraIndex = 0;
             mImageSizeIndex = 0;
         }
-
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_CODE);
-        } else {
-            setupCamera();
-        }
+        CameraActivityPermissionsDispatcher.setupCameraWithCheck(this);
     }
 
+    @NeedsPermission(Manifest.permission.CAMERA)
     public void setupCamera() {
         final Camera camera;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
@@ -188,7 +179,7 @@ public class CameraActivity extends AppCompatActivity
 
         // If lacks permissions
         //if(permissionChecker.lacksPermissions(PERMISSIONS)) {
-            // startPermissionActivity();
+        // startPermissionActivity();
         //}
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
         mIsMenuLocked = false;
@@ -204,28 +195,8 @@ public class CameraActivity extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if(requestCode == REQUEST_CODE) {
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setupCamera();
-            } else {
-                Toast.makeText(CameraActivity.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-            return;
-        }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-    //private void startPermissionActivity() {
-    //    PermissionActivity.startActivityForResult(this, REQUEST_CODE, PERMISSIONS);
-    //}
-
-    //@Override
-    //protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    //    super.onActivityResult(requestCode, resultCode, data);
-    //    if(requestCode == REQUEST_CODE && resultCode == PermissionActivity.PERMISSION_DENIED) {
-    //        finish();
-    //    }
-    //}
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
