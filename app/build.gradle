@@ -38,6 +38,4 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compile project(path: ':openCVLibrary320')
-    compile 'com.github.hotchemi:permissionsdispatcher:2.3.1'
-    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.3.1'
 }
