@@ -12,4 +12,4 @@
 -- Detecting CXX compile features - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: D:/Source/AndroidTest/AndroidCV/SlamARAndroid/app/.externalNativeBuild/cmake/debug/x86_64
+-- Build files have been written to: D:/Source/SlamARAndroid/app/.externalNativeBuild/cmake/debug/x86_64
