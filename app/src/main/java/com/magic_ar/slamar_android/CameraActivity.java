@@ -177,10 +177,6 @@ public class CameraActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
 
-        // If lacks permissions
-        //if(permissionChecker.lacksPermissions(PERMISSIONS)) {
-        // startPermissionActivity();
-        //}
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
         mIsMenuLocked = false;
     }
