@@ -5,7 +5,7 @@ extern "C"
 JNIEXPORT jstring
 
 JNICALL
-Java_com_magic_1ar_slamar_1android_CameraActivity_stringFromJNI(
+Java_com_magic_1ar_slamar_1android_MainActivity_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
