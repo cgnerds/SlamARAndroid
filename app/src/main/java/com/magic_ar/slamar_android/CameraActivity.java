@@ -1,13 +1,17 @@
 package com.magic_ar.slamar_android;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,6 +41,15 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class CameraActivity extends AppCompatActivity
   implements CameraBridgeViewBase.CvCameraViewListener2 {
+
+    // Permissions
+    private static final int REQUEST_CODE = 0;
+    static final String[] PERMISSIONS = new String[] {
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    // private PermissionChecker permissionChecker;
+
 
     // A tag for log output.
     private static final String TAG = CameraActivity.class.getSimpleName();
@@ -108,6 +121,14 @@ public class CameraActivity extends AppCompatActivity
             mImageSizeIndex = 0;
         }
 
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_CODE);
+        } else {
+            setupCamera();
+        }
+    }
+
+    public void setupCamera() {
         final Camera camera;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
@@ -126,7 +147,6 @@ public class CameraActivity extends AppCompatActivity
         camera.release();
         mSupportedImageSizes = parameters.getSupportedPreviewSizes();
         final Camera.Size size = mSupportedImageSizes.get(mImageSizeIndex);
-
         mCameraView = new JavaCameraView(this, mCameraIndex);
         mCameraView.setMaxFrameSize(size.width, size.height);
         mCameraView.setCvCameraViewListener(this);
@@ -165,6 +185,11 @@ public class CameraActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
+
+        // If lacks permissions
+        //if(permissionChecker.lacksPermissions(PERMISSIONS)) {
+            // startPermissionActivity();
+        //}
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
         mIsMenuLocked = false;
     }
@@ -176,6 +201,31 @@ public class CameraActivity extends AppCompatActivity
         }
         super.onDestroy();
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(requestCode == REQUEST_CODE) {
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setupCamera();
+            } else {
+                Toast.makeText(CameraActivity.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            return;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+    //private void startPermissionActivity() {
+    //    PermissionActivity.startActivityForResult(this, REQUEST_CODE, PERMISSIONS);
+    //}
+
+    //@Override
+    //protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    //    super.onActivityResult(requestCode, resultCode, data);
+    //    if(requestCode == REQUEST_CODE && resultCode == PermissionActivity.PERMISSION_DENIED) {
+    //        finish();
+    //    }
+    //}
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
