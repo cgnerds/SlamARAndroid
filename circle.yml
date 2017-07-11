@@ -17,4 +17,5 @@ test:
   override:
     - echo "test"
   post:
-    - cp -R ./SlamARAndroid/build/apk $CIRCLE_ARTIFACTS
+    - echo "post"
+#    - cp -R ./SlamARAndroid/build/apk $CIRCLE_ARTIFACTS
