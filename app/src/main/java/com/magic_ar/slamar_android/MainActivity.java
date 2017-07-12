@@ -19,6 +19,7 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 /*
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity
 
     // A tag for log output.
     private static final String TAG = MainActivity.class.getSimpleName();
+    //** Image Detector
+    private ImageDetectionFilter mImageDetector;
     // The camera view.
     private CameraBridgeViewBase mCameraView;
     // The OpenCV loader callback
@@ -40,6 +43,14 @@ public class MainActivity extends AppCompatActivity
                 case LoaderCallbackInterface.SUCCESS:
                     Log.d(TAG, "OpenCV loaded successfully");
                     mCameraView.enableView();
+                    //** Image Detector
+                    try {
+                        mImageDetector = new ImageDetectionFilter(MainActivity.this, R.drawable.starry_night);
+                    } catch (IOException e) {
+                        Log.e(TAG, "Failed to load drawable: " + "starry_night");
+                        e.printStackTrace();
+                        break;
+                    }
                     break;
                 default:
                     super.onManagerConnected(status);
@@ -144,6 +155,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        final Mat rgba = inputFrame.rgba();
+        //** Image detector
+        if(mImageDetector != null) {
+            Log.d(TAG, "Image detecting...");
+            mImageDetector.apply(rgba, rgba);
+        }
+
         return inputFrame.rgba();
     }
 
