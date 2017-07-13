@@ -49,7 +49,7 @@ public class ImageDetectionFilter {
     // Tentative corner coordinates detected  in the scene, in pixels.
     private final Mat mCandidateSceneCorners = new Mat(4, 1, CvType.CV_32FC2);
     // Good corner coordinates detected in the scene, in pixels.
-    private final Mat mSceneCorners = new Mat(4, 1, CvType.CV_32FC2);
+    private final Mat mSceneCorners = new Mat(0, 0, CvType.CV_32FC2); //**4,1
     // The good detected corner coordinates, in pixels, as integers.
     private final MatOfPoint mIntSceneCorners = new MatOfPoint();
 
@@ -104,10 +104,10 @@ public class ImageDetectionFilter {
     }
 
     private void findSceneCorners() {
-
-        Log.d("MainActivity", "Image detecting...");
-
         List<DMatch> matchesList = mMatches.toList();
+
+        // Log.d("MainActivity", "findSceneCorners: " + matchesList.size());
+
         if(matchesList.size() < 4) {
             // There are too few matches to find the homography.
             return;
@@ -188,6 +188,9 @@ public class ImageDetectionFilter {
     }
 
     protected void draw(Mat src, Mat dst) {
+
+        Log.d("MainActivity", "Draw ....");
+
         if(dst != src) {
             src.copyTo(dst);
         }

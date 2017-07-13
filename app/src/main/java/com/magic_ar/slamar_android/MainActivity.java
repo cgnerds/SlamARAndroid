@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity
                     } catch (IOException e) {
                         Log.e(TAG, "Failed to load drawable: " + "starry_night");
                         e.printStackTrace();
-                        break;
                     }
                     break;
                 default:
@@ -162,7 +161,7 @@ public class MainActivity extends AppCompatActivity
             mImageDetector.apply(rgba, rgba);
         }
 
-        return inputFrame.rgba();
+        return rgba;
     }
 
     @Override
