@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity
                 glSurfaceView.setRenderer(mARRenderer);
                 Camera camera = Camera.open(0);
                 final Camera.Parameters  parameters = camera.getParameters();
-                final Camera.Size size = camera.new Size(1080,1920);
+                final Camera.Size size = camera.new Size(1280,720);
                 camera.release();
                 mCameraProjectionAdapter.setCameraParameters(parameters, size);
             }

@@ -15,8 +15,8 @@ import org.opencv.core.MatOfDouble;
 public class CameraProjectionAdapter {
     float mFOVY = 45f; // equivalent in 35mm photography: 28mm lens
     float mFOVX = 60f; // equivalent in 35mm photography: 28mm lens
-    int mHeightPx = 480;
-    int mWidthPx = 640;
+    int mHeightPx = 720;
+    int mWidthPx = 1280;
 
     float mNear = 0.1f;
     float mFar = 10f;

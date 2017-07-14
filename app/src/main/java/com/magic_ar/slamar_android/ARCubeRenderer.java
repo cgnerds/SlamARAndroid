@@ -78,9 +78,9 @@ public class ARCubeRenderer implements GLSurfaceView.Renderer {
     }
 
     @Override
-    public void onSurfaceChanged(GL10 gl10, int i, int i1) {
-        mSurfaceWidth = i;
-        mSurfaceHeight = i1;
+    public void onSurfaceChanged(final GL10 gl10, int width, int height) {
+        mSurfaceWidth = width;
+        mSurfaceHeight = height;
     }
 
     @Override
