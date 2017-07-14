@@ -11,10 +11,13 @@ import org.opencv.core.DMatch;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
+import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point;
+import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
@@ -67,7 +70,29 @@ public class ImageDetectionFilter {
     // The color of the outline drawn around the detected image.
     private final Scalar mLineColor = new Scalar(0, 255, 0);
 
-    public ImageDetectionFilter(final Context context,final int refernceImageResourceID) throws IOException {
+    // The reference image's corner coordinates, in 3D, in real units.
+    private final MatOfPoint3f mReferenceCorners3D = new MatOfPoint3f();
+    // Good corner coordinates detected in the scene, in pixels.
+    private final MatOfPoint2f mSceneCorners2D = new MatOfPoint2f();
+    // Distortion coefficients of the camera's lens. Assume no distortion.
+    private final MatOfDouble mDistCoeffs = new MatOfDouble(0.0, 0.0, 0.0, 0.0);
+    // An adapter that provides the camera's projection matrix.
+    private final CameraProjectionAdapter mCameraProjectionAdapter;
+    // The Euler angles of the detected target.
+    private final MatOfDouble mRVec = new MatOfDouble();
+    // The XYZ coordinates of the detected target.
+    private final MatOfDouble mTVec = new MatOfDouble();
+    // The rotation matrix of the detected target.
+    private final MatOfDouble mRotation = new MatOfDouble();
+    // The OpenGL pose matrix of the detected target.
+    private final float[] mGLPose = new float[16];
+    // Whether the target is currently detected.
+    private boolean mTargetFound = false;
+
+    public ImageDetectionFilter(final Context context,
+                                final int refernceImageResourceID,
+                                final CameraProjectionAdapter cameraProjectionAdapter,
+                                final double realSize) throws IOException {
         // Load the reference image from the app's resources. It is loaded in BGR (blue, green , red) format.
         mReferenceImage = Utils.loadResource(context, refernceImageResourceID, Imgcodecs.CV_LOAD_IMAGE_COLOR);
         // Create grayscale and RGBA versions of the reference image.
@@ -81,35 +106,59 @@ public class ImageDetectionFilter {
         mReferenceCorners.put(2, 0, new double[]{referenceImageGray.cols(), referenceImageGray.rows()});
         mReferenceCorners.put(3, 0, new double[]{0.0, referenceImageGray.rows()});
 
+        // Compute the image's width and height in real units, based on the specified real size of
+        // the image's smaller dimension.
+        final double aspectRatio = (double)referenceImageGray.cols()/(double)referenceImageGray.rows();
+        final double halfRealWidth;
+        final double halfRealHeight;
+        if(referenceImageGray.cols() > referenceImageGray.rows()) {
+            halfRealHeight = 0.5f * realSize;
+            halfRealWidth = halfRealHeight * aspectRatio;
+        } else {
+            halfRealWidth = 0.5f * realSize;
+            halfRealHeight = halfRealWidth / aspectRatio;
+        }
+
+        // Define the printed image so that it normally lies in the xy plane (like a painting or poster
+        // on a wall). That is, +z normally points out of the page toward the viewer.
+        mReferenceCorners3D.fromArray(
+                new Point3(-halfRealWidth, -halfRealHeight, 0.0),
+                new Point3( halfRealWidth, -halfRealHeight, 0.0),
+                new Point3( halfRealWidth,  halfRealHeight, 0.0),
+                new Point3(-halfRealWidth,  halfRealHeight, 0.0));
+
         // Detect the reference features and compute their descriptors.
         mFeatureDetector.detect(referenceImageGray, mReferenceKeypoints);
         mDescriptorExtractor.compute(referenceImageGray, mReferenceKeypoints, mReferenceDescriptors);
+
+        mCameraProjectionAdapter = cameraProjectionAdapter;
+    }
+
+    public float[] getGLPose() {
+        return (mTargetFound ? mGLPose : null);
     }
 
     public void apply(final Mat src, final Mat dst) {
         // Convert the scene to grayscale.
         Imgproc.cvtColor(src, mGraySrc, Imgproc.COLOR_RGBA2GRAY);
 
-        // Detect the scene features, compute their descriptors, and match the scene descriptors to reference descriptors.
+        // Detect the scene features, compute their descriptors, and match the scene descriptors to
+        // reference descriptors.
         mFeatureDetector.detect(mGraySrc, mSceneKeypoints);
         mDescriptorExtractor.compute(mGraySrc, mSceneKeypoints, mSceneDescriptors);
         mDescriptorMatcher.match(mSceneDescriptors, mReferenceDescriptors, mMatches);
 
-        // Attempt to find the target image's corners in the scene.
-        findSceneCorners();
+        // Attempt to find the target image's 3D pose in the scene.
+        findPose();
 
-        // If the corners have been found, draw an outline around the target image.
-        // Else, draw a thumbnail of the target image.
+        // If the pose has been found, draw an thumbnail of the target image.
         draw(src, dst);
     }
 
-    private void findSceneCorners() {
+    private void findPose() {
         List<DMatch> matchesList = mMatches.toList();
-
-        // Log.d("MainActivity", "findSceneCorners: " + matchesList.size());
-
         if(matchesList.size() < 4) {
-            // There are too few matches to find the homography.
+            // There are too few matches to find the pose.
             return;
         }
 
@@ -133,11 +182,11 @@ public class ImageDetectionFilter {
         // related to pixel distances; it is related to the number of failed tests for similarity
         // between the matched descriptors.
         if(minDist > 50.0) {
-            // The target is completely lost. Discard any previously found corners.
-            mSceneCorners.create(0,0, mSceneCorners.type());
+            // The target is completely lost.
+            mTargetFound = false;
             return;
         } else if (minDist > 25.0) {
-            // The target is lost but maybe it is still close. Keep any previously found corners.
+            // The target is lost but maybe it is still close. Keep any previously found pose.
             return;
         }
 
@@ -145,7 +194,7 @@ public class ImageDetectionFilter {
         ArrayList<Point> goodReferencePointsList = new ArrayList<Point>();
         ArrayList<Point> goodScenePointsList = new ArrayList<Point>();
         double maxGoodMatchDist = 1.75 * minDist;
-        for(DMatch match:matchesList) {
+        for(final DMatch match:matchesList) {
             if(match.distance < maxGoodMatchDist) {
                 goodReferencePointsList.add(
                         referenceKeypointsList.get(match.trainIdx).pt);
@@ -155,21 +204,21 @@ public class ImageDetectionFilter {
         }
 
         if(goodReferencePointsList.size() < 4 || goodScenePointsList.size() < 4) {
-            // There are too few good points to find the homography.
+            // There are too few good points to find the pose.
             return ;
         }
 
-        // There are enough good points to find the homography. (Otherwise, the method would have
-        // already returned.
+        // There are enough good points to find the pose. (Otherwise, the method would have
+        // already returned.)
         // Convert the matched points to MatOfPoint2f format, as required by the Calib3d.findHomography
         // function.
-        MatOfPoint2f goodReferencePoints = new MatOfPoint2f();
+        final MatOfPoint2f goodReferencePoints = new MatOfPoint2f();
         goodReferencePoints.fromList(goodReferencePointsList);
-        MatOfPoint2f goodScenePoints = new MatOfPoint2f();
+        final MatOfPoint2f goodScenePoints = new MatOfPoint2f();
         goodScenePoints.fromList(goodScenePointsList);
 
         // Find the homography.
-        Mat homography = Calib3d.findHomography(goodReferencePoints, goodScenePoints);
+        final Mat homography = Calib3d.findHomography(goodReferencePoints, goodScenePoints);
 
         // Use the homography to project the reference corner coordinates into scene coordinates.
         Core.perspectiveTransform(mReferenceCorners, mCandidateSceneCorners, homography);
@@ -182,27 +231,74 @@ public class ImageDetectionFilter {
         //  concave polygon), the detection result is invalid because no real perspective can make
         // the corners of a rectangular image look like a concave polygon!
         if(Imgproc.isContourConvex(mIntSceneCorners)) {
-            // The corners form a convex polygon, so record them as valid scene cornes.
-            mCandidateSceneCorners.copyTo(mSceneCorners);
+            return;
         }
+
+        final double[] sceneCorner0 = mCandidateSceneCorners.get(0,0);
+        final double[] sceneCorner1 = mCandidateSceneCorners.get(1,0);
+        final double[] sceneCorner2 = mCandidateSceneCorners.get(2,0);
+        final double[] sceneCorner3 = mCandidateSceneCorners.get(3,0);
+        mSceneCorners2D.fromArray(
+                new Point(sceneCorner0[0], sceneCorner0[1]),
+                new Point(sceneCorner1[0], sceneCorner1[1]),
+                new Point(sceneCorner2[0], sceneCorner2[1]),
+                new Point(sceneCorner3[0], sceneCorner3[1]));
+
+        final MatOfDouble projection = mCameraProjectionAdapter.getmProjectionCV();
+
+        // Find the target's Euler angles and XYZ coordinates;.
+        Calib3d.solvePnP(mReferenceCorners3D, mSceneCorners2D, projection, mDistCoeffs, mRVec, mTVec);
+
+        // Positive y is up in OpenGL, down in OpenCV.
+        // Positive z is backward in OpenGL, forward in OpenCV.
+        // Positive angles are counter-clockwise in OpenGL, clockwise in OpenCV.
+        // Thus, x angles are negated but y and z angles are double-negated (that is, unchanged).
+        // Meanwhile, y and z positions are negated.
+        final double[] rVecArray = mRVec.toArray();
+        rVecArray[0] *= -1.0; // negate x angle
+        mRVec.fromArray(rVecArray);
+
+        // Convertt the Eular angles to a 3x3 rotation matrix.
+        Calib3d.Rodrigues(mRVec, mRotation);
+
+        final double[] tVecArray = mTVec.toArray();
+
+        // OpenCV's matrix format is transposed, relative to OpenGL's matrix format.
+        mGLPose[0] = (float)mRotation.get(0,0)[0];
+        mGLPose[1] = (float)mRotation.get(0,1)[0];
+        mGLPose[2] = (float)mRotation.get(0,2)[0];
+        mGLPose[3] = 0f;
+        mGLPose[4] = (float)mRotation.get(1,0)[0];
+        mGLPose[5] = (float)mRotation.get(1,1)[0];
+        mGLPose[6] = (float)mRotation.get(1,2)[0];
+        mGLPose[7] = 0f;
+        mGLPose[8] = (float)mRotation.get(2,0)[0];
+        mGLPose[9] = (float)mRotation.get(2,1)[0];
+        mGLPose[10] = (float)mRotation.get(2,2)[0];
+        mGLPose[11] = 0f;
+        mGLPose[12] =  (float)tVecArray[0];
+        mGLPose[13] = -(float)tVecArray[1]; // negate y position
+        mGLPose[14] = -(float)tVecArray[2]; // negate z position
+        mGLPose[15] = 1f;
+
+        mTargetFound = true;
     }
 
     protected void draw(Mat src, Mat dst) {
-
         Log.d("MainActivity", "Draw ....");
 
         if(dst != src) {
             src.copyTo(dst);
         }
 
-        if(mSceneCorners.height() < 4) {
+        if(!mTargetFound) {
             // The target has not been found.
-            // Draw a thumbnail of the target in the upper-left corner so that the user konws what it is.
+            // Draw a thumbnail of the target in the upper-left corner so that the user knows what it is.
             // Compute the thumbnail's larger dimension as half the video frame's smaller dimension.
             int height = mReferenceImage.height();
             int width = mReferenceImage.width();
-            int maxDimension = Math.min(dst.width(), dst.height()) / 2;
-            double aspectRatio = width / (double) height;
+            final int maxDimension = Math.min(dst.width(), dst.height()) / 2;
+            final double aspectRatio = width / (double) height;
             if(height > width) {
                 height = maxDimension;
                 width = (int)(height * aspectRatio);
@@ -212,21 +308,11 @@ public class ImageDetectionFilter {
             }
 
             // Select the region of interest (ROI) where the thumbnail will be drawn.
-            Mat dstROI = dst.submat(0, height, 0, width);
+            final Mat dstROI = dst.submat(0, height, 0, width);
             // Copy a resized reference image into the ROI.
             Imgproc.resize(mReferenceImage, dstROI, dstROI.size(), 0.0, 0.0, Imgproc.INTER_AREA);
             return;
         }
-
-        // Outline the found target in green.
-        Imgproc.line(dst, new Point(mSceneCorners.get(0,0)),
-                new Point(mSceneCorners.get(1, 0)), mLineColor, 4);
-        Imgproc.line(dst, new Point(mSceneCorners.get(1,0)),
-                new Point(mSceneCorners.get(2, 0)), mLineColor, 4);
-        Imgproc.line(dst, new Point(mSceneCorners.get(2,0)),
-                new Point(mSceneCorners.get(3, 0)), mLineColor, 4);
-        Imgproc.line(dst, new Point(mSceneCorners.get(3,0)),
-                new Point(mSceneCorners.get(0, 0)), mLineColor, 4);
     }
 }
 
