@@ -3,6 +3,9 @@ package com.magic_ar.slamar_android;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
+import android.graphics.PixelFormat;
+import android.hardware.Camera;
+import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -10,11 +13,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SurfaceView;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
@@ -35,6 +40,11 @@ public class MainActivity extends AppCompatActivity
     private ImageDetectionFilter mImageDetector;
     // The camera view.
     private CameraBridgeViewBase mCameraView;
+    // An adapter between the video camera and projection matrix.
+    private CameraProjectionAdapter mCameraProjectionAdapter;
+    // The renderer for 3D augumentations
+    private ARCubeRenderer mARRenderer;
+
     // The OpenCV loader callback
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -45,7 +55,8 @@ public class MainActivity extends AppCompatActivity
                     mCameraView.enableView();
                     //** Image Detector
                     try {
-                        mImageDetector = new ImageDetectionFilter(MainActivity.this, R.drawable.starry_night);
+                        mImageDetector = new ImageDetectionFilter(MainActivity.this,
+                                R.drawable.starry_night, mCameraProjectionAdapter, 1.0);
                     } catch (IOException e) {
                         Log.e(TAG, "Failed to load drawable: " + "starry_night");
                         e.printStackTrace();
@@ -66,12 +77,40 @@ public class MainActivity extends AppCompatActivity
         // Load the OpenCV package first.
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
 
-        mCameraView = (CameraBridgeViewBase) findViewById(R.id.openCvView);
+        //** OpenCV
+        mCameraView = new JavaCameraView(this, 0);
+        mCameraView.setCvCameraViewListener(this);
+        mCameraView.setLayoutParams(
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        //** OpenGL
+        final GLSurfaceView glSurfaceView = new GLSurfaceView(MainActivity.this);
+        glSurfaceView.getHolder().setFormat(PixelFormat.TRANSPARENT);
+        glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+        glSurfaceView.setZOrderOnTop(true);
+        glSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+
         requestCameraPermission(new PermissionCallback() {
             @Override
             public void onSuccess() {
-                mCameraView.setVisibility(SurfaceView.VISIBLE);
-                mCameraView.setCvCameraViewListener(MainActivity.this);
+                // mCameraView.setVisibility(SurfaceView.VISIBLE);
+                ((ViewGroup)findViewById(R.id.preview)).addView(mCameraView);
+                ((ViewGroup)findViewById(R.id.preview)).addView(glSurfaceView);
+
+                mCameraProjectionAdapter = new CameraProjectionAdapter();
+                mARRenderer = new ARCubeRenderer();
+                mARRenderer.cameraProjectionAdapter = mCameraProjectionAdapter;
+                // Earlier, we defined the printed image's size as 1.0 unit.
+                // Define the cube to be half this size.
+                mARRenderer.scale = 0.5f;
+                glSurfaceView.setRenderer(mARRenderer);
+                Camera camera = Camera.open(0);
+                final Camera.Parameters  parameters = camera.getParameters();
+                final Camera.Size size = camera.new Size(1080,1920);
+                camera.release();
+                mCameraProjectionAdapter.setCameraParameters(parameters, size);
             }
 
             @Override

@@ -26,7 +26,7 @@ public class CameraProjectionAdapter {
     MatOfDouble mProjectionCV;
     boolean mProjectionDirtyCV = true;
 
-    private void setCameraParameters(final Camera.Parameters cameraParameters, final Camera.Size imageSize)
+    public void setCameraParameters(final Camera.Parameters cameraParameters, final Camera.Size imageSize)
     {
         mFOVX = cameraParameters.getVerticalViewAngle();
         mFOVY = cameraParameters.getHorizontalViewAngle();
