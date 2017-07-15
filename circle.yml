@@ -9,8 +9,8 @@ machine:
     ANDROID_HOME: /user/local/android-sdk-linux
     GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
     _JAVA_OPTIONS: "-Xms512m -Xmx1024m"
-    ANDROID_NDK_HOME: $ANDROID_NDK
     ANDROID_NDK: $HOME/android-ndk-r15b
+    ANDROID_NDK_HOME: $ANDROID_NDK
     PATH: $PATH:$ANDROID_NDK
     
 dependencies:
