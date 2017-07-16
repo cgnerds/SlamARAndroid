@@ -16,7 +16,6 @@ machine:
 dependencies:
   cache_directories:
     - ~/android-ndk-r15b
-  sdkmanager "cmake;3.6.4111459"
   pre:
     - if [[ ! -e ~/android-ndk-r15b ]]; then wget http://dl.google.com/android/repository/android-ndk-r15b-linux-x86_64.zip && unzip -d ~ android-ndk-r15b-linux-x86_64.zip; fi
     - echo y | android update sdk --no-ui --all --filter tools,platform-tools,android-26
@@ -29,7 +28,6 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter extra-google-m2repository
   override:
         - chmod +x gradlew
-        - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
 test:
     override:
         - (./gradlew assemble):
