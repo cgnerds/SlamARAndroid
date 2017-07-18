@@ -9,6 +9,10 @@ android {
         targetSdkVersion 23
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
     buildTypes {
         release {
             minifyEnabled false
