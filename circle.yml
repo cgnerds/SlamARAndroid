@@ -1,6 +1,6 @@
 #
 # Build configuration for Circle CI
-#
+# Reference: https://gist.github.com/donnfelker/40ccd35ab678e7aa7bdc600329829b9e
 # See this thread for speeding up and caching directories:
 # https://discuss.circleci.com/t/installing-android-build-tools-23-0-2/924
 #
@@ -30,20 +30,20 @@ dependencies:
 # Comment the test stuff out (or remove it) if you don't need it.
 test:
   pre:
-    #- emulator -avd circleci-android23 -no-window:
-    #      background: true
-    #      parallel: true
-    #- circle-android wait-for-boot
+    - emulator -avd circleci-android22 -no-audio -no-window:
+          background: true
+          parallel: true
+    - circle-android wait-for-boot
     # unlock emulator
-    #- sleep 30
-    #- adb shell input keyevent 82
+    - sleep 30
+    - adb shell input keyevent 82
 
   override:
 #    - ./gradlew clean assemble
     # This will run the tests:
-   #- ./gradlew assemble connectedDebugAndroidTest -PdisablePreDex --console=plain --info
-   - ./gradlew build
+   - ./gradlew assemble connectedDebugAndroidTest -PdisablePreDex --console=plain --info
+   #- ./gradlew build
 
   post:
       - cp -r app/build/outputs $CIRCLE_ARTIFACTS
-      #- cp -r app/build/outputs/androidTest-results/connected/ $CIRCLE_TEST_REPORTS
+      - cp -r app/build/outputs/androidTest-results/connected/ $CIRCLE_TEST_REPORTS
