@@ -72,7 +72,7 @@ public class ARCubeRenderer implements GLSurfaceView.Renderer {
     }
 
     @Override
-    public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
+    public void onSurfaceCreated(final GL10 gl10, final EGLConfig eglConfig) {
         gl10.glClearColor(0f, 0f, 0f, 0f); // transparent
         gl10.glEnable(GL10.GL_CULL_FACE);
     }
@@ -110,13 +110,10 @@ public class ARCubeRenderer implements GLSurfaceView.Renderer {
 
         gl10.glMatrixMode(GL10.GL_MODELVIEW);
         gl10.glLoadMatrixf(pose, 0);
-
         gl10.glScalef(scale, scale, scale);
+
         // Move the cube forward so that it is not halfway inside the image.
         gl10.glTranslatef(0f, 0f, 0.5f);
-        gl10.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-        gl10.glEnableClientState(GL10.GL_COLOR_ARRAY);
-
         gl10.glVertexPointer(3, GL11.GL_FLOAT, 0, VERTICES);
         gl10.glColorPointer(4, GL11.GL_UNSIGNED_BYTE, 0, COLORS);
 

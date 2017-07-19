@@ -44,6 +44,8 @@ public class ImageDetectionFilter {
     // CvType defines the color depth,number of channels, and channel layout in the image. Here,
     // each point is represented by two 32-bit floats
     private final Mat mReferenceCorners = new Mat(4, 1, CvType.CV_32FC2);
+    // The reference image's corner coordinates, in 3D, in real units.
+    private final MatOfPoint3f mReferenceCorners3D = new MatOfPoint3f();
 
     // Features ot the scene (the current frame).
     private final MatOfKeyPoint mSceneKeypoints = new MatOfKeyPoint();
@@ -52,7 +54,7 @@ public class ImageDetectionFilter {
     // Tentative corner coordinates detected  in the scene, in pixels.
     private final Mat mCandidateSceneCorners = new Mat(4, 1, CvType.CV_32FC2);
     // Good corner coordinates detected in the scene, in pixels.
-    private final Mat mSceneCorners = new Mat(0, 0, CvType.CV_32FC2); //**4,1
+    private final MatOfPoint2f mSceneCorners2D = new MatOfPoint2f();
     // The good detected corner coordinates, in pixels, as integers.
     private final MatOfPoint mIntSceneCorners = new MatOfPoint();
 
@@ -67,15 +69,10 @@ public class ImageDetectionFilter {
     private final DescriptorExtractor mDescriptorExtractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
     // A descriptor matcher, which matches features based on their descriptors.
     private final DescriptorMatcher mDescriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMINGLUT);
-    // The color of the outline drawn around the detected image.
-    private final Scalar mLineColor = new Scalar(0, 255, 0);
 
-    // The reference image's corner coordinates, in 3D, in real units.
-    private final MatOfPoint3f mReferenceCorners3D = new MatOfPoint3f();
-    // Good corner coordinates detected in the scene, in pixels.
-    private final MatOfPoint2f mSceneCorners2D = new MatOfPoint2f();
     // Distortion coefficients of the camera's lens. Assume no distortion.
     private final MatOfDouble mDistCoeffs = new MatOfDouble(0.0, 0.0, 0.0, 0.0);
+
     // An adapter that provides the camera's projection matrix.
     private final CameraProjectionAdapter mCameraProjectionAdapter;
     // The Euler angles of the detected target.
@@ -86,6 +83,7 @@ public class ImageDetectionFilter {
     private final MatOfDouble mRotation = new MatOfDouble();
     // The OpenGL pose matrix of the detected target.
     private final float[] mGLPose = new float[16];
+
     // Whether the target is currently detected.
     private boolean mTargetFound = false;
 
@@ -311,7 +309,6 @@ public class ImageDetectionFilter {
             final Mat dstROI = dst.submat(0, height, 0, width);
             // Copy a resized reference image into the ROI.
             Imgproc.resize(mReferenceImage, dstROI, dstROI.size(), 0.0, 0.0, Imgproc.INTER_AREA);
-            return;
         }
     }
 }
