@@ -12,11 +12,11 @@ import org.opencv.core.MatOfDouble;
 
 // Use the deprecated Camera class.
 @SuppressWarnings("depreacation")
-public class CameraProjectionAdapter {
+public final class CameraProjectionAdapter {
     float mFOVY = 45f; // equivalent in 35mm photography: 28mm lens
     float mFOVX = 60f; // equivalent in 35mm photography: 28mm lens
-    int mHeightPx = 720;
-    int mWidthPx = 1280;
+    int mHeightPx = 480;
+    int mWidthPx = 640;
     float mNear = 0.1f;
     float mFar = 10f;
 
@@ -74,8 +74,8 @@ public class CameraProjectionAdapter {
             final float fovAspectRatio = mFOVX / mFOVY;
             final double diagonalPx = Math.sqrt(
                     (Math.pow(mWidthPx, 2.0) + Math.pow(mWidthPx/fovAspectRatio, 2.0)));
-            final double focalLengthPx = 0.5 * diagonalPx / Math.sqrt (
-                    Math.pow(Math.tan(0.5*mFOVX*Math.PI/180f), 2.0) + Math.pow(Math.tan(0.5*mFOVY*Math.PI/180f), 2.0));
+            final double diagonalFOV = Math.sqrt((Math.pow(mFOVX, 2.0) + Math.pow(mFOVY, 2.0)));
+            final double focalLengthPx = diagonalPx / (2.0 * Math.tan(0.5 * diagonalFOV * Math.PI /180f));
 
             mProjectionCV.put(0,0, focalLengthPx);
             mProjectionCV.put(0,1, 0.0);
