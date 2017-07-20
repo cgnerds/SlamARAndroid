@@ -154,20 +154,20 @@ public class ImageDetectionFilter {
     }
 
     private void findPose() {
-        List<DMatch> matchesList = mMatches.toList();
+        final List<DMatch> matchesList = mMatches.toList();
         if(matchesList.size() < 4) {
             // There are too few matches to find the pose.
             return;
         }
 
-        List<KeyPoint> referenceKeypointsList = mReferenceKeypoints.toList();
-        List<KeyPoint> sceneKeypointsList = mSceneKeypoints.toList();
+        final List<KeyPoint> referenceKeypointsList = mReferenceKeypoints.toList();
+        final List<KeyPoint> sceneKeypointsList = mSceneKeypoints.toList();
 
         // Calculate the max and min distances between keypoints.
         double maxDist = 0.0;
         double minDist = Double.MAX_VALUE;
-        for(DMatch match : matchesList) {
-            double dist = match.distance;
+        for(final DMatch match : matchesList) {
+            final double dist = match.distance;
             if(dist < minDist) {
                 minDist = dist;
             }
@@ -189,9 +189,9 @@ public class ImageDetectionFilter {
         }
 
         // Identify "good" keypoints based on match distance.
-        ArrayList<Point> goodReferencePointsList = new ArrayList<Point>();
-        ArrayList<Point> goodScenePointsList = new ArrayList<Point>();
-        double maxGoodMatchDist = 1.75 * minDist;
+        final List<Point> goodReferencePointsList = new ArrayList<Point>();
+        final ArrayList<Point> goodScenePointsList = new ArrayList<Point>();
+        final double maxGoodMatchDist = 1.75 * minDist;
         for(final DMatch match:matchesList) {
             if(match.distance < maxGoodMatchDist) {
                 goodReferencePointsList.add(
@@ -228,7 +228,7 @@ public class ImageDetectionFilter {
         // Check whether the corners from a convex polygon. If not,(that is, if the corners form a
         //  concave polygon), the detection result is invalid because no real perspective can make
         // the corners of a rectangular image look like a concave polygon!
-        if(Imgproc.isContourConvex(mIntSceneCorners)) {
+        if(!Imgproc.isContourConvex(mIntSceneCorners)) {
             return;
         }
 
