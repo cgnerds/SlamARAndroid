@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity
 
         //** OpenCV
         mCameraView = new JavaCameraView(MainActivity.this, 0);
-        mCameraView.setCvCameraViewListener(this);
+        mCameraView.setCvCameraViewListener(MainActivity.this);
         mCameraView.setLayoutParams(
                 new FrameLayout.LayoutParams(
                         FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
