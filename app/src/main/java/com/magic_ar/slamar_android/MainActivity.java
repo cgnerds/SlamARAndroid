@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, MainActivity.this, mLoaderCallback);
 
         //** OpenCV
-        mCameraView = new JavaCameraView(this, 0);
+        mCameraView = new JavaCameraView(MainActivity.this, 0);
         mCameraView.setCvCameraViewListener(this);
         mCameraView.setLayoutParams(
                 new FrameLayout.LayoutParams(
