@@ -55,8 +55,7 @@ public class MainActivity extends AppCompatActivity
                     mCameraView.enableView();
                     //** Image Detector
                     try {
-                        mImageDetector = new ImageDetectionFilter(MainActivity.this,
-                                R.drawable.starry_night, mCameraProjectionAdapter, 1.0);
+                        mImageDetector = new ImageDetectionFilter(MainActivity.this, R.drawable.starry_night, mCameraProjectionAdapter, 1.0);
                     } catch (IOException e) {
                         Log.e(TAG, "Failed to load drawable: " + "starry_night");
                         e.printStackTrace();
