@@ -42,13 +42,13 @@ public class MainActivity extends AppCompatActivity
     private CameraBridgeViewBase mCameraView;
     // An adapter between the video camera and projection matrix.
     private CameraProjectionAdapter mCameraProjectionAdapter;
-    // The renderer for 3D augumentations
+    // The renderer for 3D augmentations
     private ARCubeRenderer mARRenderer;
 
     // The OpenCV loader callback
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
-        public void onManagerConnected(int status) {
+        public void onManagerConnected(final int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                     Log.d(TAG, "OpenCV loaded successfully");
@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity
                     //** Image Detector
                     try {
                         mImageDetector = new ImageDetectionFilter(MainActivity.this, R.drawable.starry_night, mCameraProjectionAdapter, 1.0);
+                        mARRenderer.filter = mImageDetector;
                     } catch (IOException e) {
                         Log.e(TAG, "Failed to load drawable: " + "starry_night");
                         e.printStackTrace();
@@ -91,6 +92,10 @@ public class MainActivity extends AppCompatActivity
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT));
 
+        //**
+        mARRenderer = new ARCubeRenderer();
+
+
         requestCameraPermission(new PermissionCallback() {
             @Override
             public void onSuccess() {
@@ -99,7 +104,6 @@ public class MainActivity extends AppCompatActivity
                 ((ViewGroup)findViewById(R.id.preview)).addView(glSurfaceView);
 
                 mCameraProjectionAdapter = new CameraProjectionAdapter();
-                mARRenderer = new ARCubeRenderer();
                 mARRenderer.cameraProjectionAdapter = mCameraProjectionAdapter;
                 // Earlier, we defined the printed image's size as 1.0 unit.
                 // Define the cube to be half this size.

@@ -2,6 +2,7 @@ package com.magic_ar.slamar_android;
 
 import android.hardware.Camera;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import org.opencv.core.CvType;
 import org.opencv.core.MatOfDouble;
@@ -15,10 +16,10 @@ import org.opencv.core.MatOfDouble;
 public final class CameraProjectionAdapter {
     float mFOVY = 45f; // equivalent in 35mm photography: 28mm lens
     float mFOVX = 60f; // equivalent in 35mm photography: 28mm lens
-    int mHeightPx = 480;
-    int mWidthPx = 640;
+    int mHeightPx = 720;
+    int mWidthPx = 1280;
     float mNear = 0.1f;
-    float mFar = 10f;
+    float mFar = 1000f;
 
     final float[] mProjectionGL = new float[16];
     boolean mProjectionDirtyGL = true;
@@ -36,6 +37,9 @@ public final class CameraProjectionAdapter {
 
         mProjectionDirtyGL = true;
         mProjectionDirtyCV = true;
+
+        String output = "mFOVX: " + mFOVX + ", mFOVY: " + mFOVY + ", mHeightPx: " + mHeightPx + ", mWidthPx: " + mWidthPx;
+        Log.d("Camera", output);
     }
 
     public  float getAspectRatio() {
