@@ -33,7 +33,7 @@ import java.util.List;
  * Created by cgnerds on 2017/7/12.
  */
 
-public class ImageDetectionFilter {
+public class ImageDetector {
     // The reference image (this detector's target).
     private final Mat mReferenceImage;
     // Features of the reference image.
@@ -87,7 +87,7 @@ public class ImageDetectionFilter {
     // Whether the target is currently detected.
     private boolean mTargetFound = false;
 
-    public ImageDetectionFilter(final Context context,
+    public ImageDetector(final Context context,
                                 final int refernceImageResourceID,
                                 final CameraProjectionAdapter cameraProjectionAdapter,
                                 final double realSize) throws IOException {

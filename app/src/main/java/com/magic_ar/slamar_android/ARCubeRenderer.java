@@ -14,9 +14,9 @@ import javax.microedition.khronos.opengles.GL11;
  */
 
 public class ARCubeRenderer implements GLSurfaceView.Renderer {
-    public ImageDetectionFilter filter;
+    public ImageDetector filter;
     public CameraProjectionAdapter cameraProjectionAdapter;
-    public float scale = 1f;
+    public float scale = 0.5f;
 
     private int mSurfaceWidth;
     private int mSurfaceHeight;

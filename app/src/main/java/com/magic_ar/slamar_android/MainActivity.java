@@ -36,8 +36,17 @@ public class MainActivity extends AppCompatActivity
 
     // A tag for log output.
     private static final String TAG = MainActivity.class.getSimpleName();
-    //** Image Detector
-    private ImageDetectionFilter mImageDetector;
+
+    // OpenCV static initialization
+    static {
+        if(!OpenCVLoader.initDebug())
+            Log.d("ERROR", "Unable to load OpenCV");
+        else
+            Log.d("SUCCESS", "OpenCV loaded.");
+    }
+
+    // Image Detector
+    private ImageDetector mImageDetector;
     // The camera view.
     private CameraBridgeViewBase mCameraView;
     // An adapter between the video camera and projection matrix.
@@ -45,75 +54,52 @@ public class MainActivity extends AppCompatActivity
     // The renderer for 3D augmentations
     private ARCubeRenderer mARRenderer;
 
-    // The OpenCV loader callback
-    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-        @Override
-        public void onManagerConnected(final int status) {
-            switch (status) {
-                case LoaderCallbackInterface.SUCCESS:
-                    Log.d(TAG, "OpenCV loaded successfully");
-                    mCameraView.enableView();
-                    //** Image Detector
-                    try {
-                        mImageDetector = new ImageDetectionFilter(MainActivity.this, R.drawable.starry_night, mCameraProjectionAdapter, 1.0);
-                        mARRenderer.filter = mImageDetector;
-                    } catch (IOException e) {
-                        Log.e(TAG, "Failed to load drawable: " + "starry_night");
-                        e.printStackTrace();
-                    }
-                    break;
-                default:
-                    super.onManagerConnected(status);
-                    break;
-            }
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // Load the OpenCV package first.
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, MainActivity.this, mLoaderCallback);
 
-        //** OpenCV
-        mCameraView = new JavaCameraView(MainActivity.this, 0);
-        mCameraView.setCvCameraViewListener(MainActivity.this);
-        mCameraView.setLayoutParams(
-                new FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        //** OpenGL
+        // JavaCameraView
+        mCameraView = new JavaCameraView(this, 0);
+        mCameraView.setCvCameraViewListener(this);
+        mCameraView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+        // GLSurfaceView
         final GLSurfaceView glSurfaceView = new GLSurfaceView(MainActivity.this);
         glSurfaceView.getHolder().setFormat(PixelFormat.TRANSPARENT);
         glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
         glSurfaceView.setZOrderOnTop(true);
-        glSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
-
-        //**
-        mARRenderer = new ARCubeRenderer();
-
+        glSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
         requestCameraPermission(new PermissionCallback() {
             @Override
             public void onSuccess() {
-                // mCameraView.setVisibility(SurfaceView.VISIBLE);
-                ((ViewGroup)findViewById(R.id.preview)).addView(mCameraView);
-                ((ViewGroup)findViewById(R.id.preview)).addView(glSurfaceView);
-
+                mARRenderer = new ARCubeRenderer();
+                // CameraProjectionAdapter
                 mCameraProjectionAdapter = new CameraProjectionAdapter();
-                mARRenderer.cameraProjectionAdapter = mCameraProjectionAdapter;
-                // Earlier, we defined the printed image's size as 1.0 unit.
-                // Define the cube to be half this size.
-                mARRenderer.scale = 0.5f;
-                glSurfaceView.setRenderer(mARRenderer);
                 Camera camera = Camera.open(0);
                 final Camera.Parameters  parameters = camera.getParameters();
                 final Camera.Size size = camera.new Size(1280,720);
                 camera.release();
                 mCameraProjectionAdapter.setCameraParameters(parameters, size);
+                mARRenderer.cameraProjectionAdapter = mCameraProjectionAdapter;
+                // ImageDetector
+                try {
+                        mImageDetector = new ImageDetector(MainActivity.this, R.drawable.starry_night, mCameraProjectionAdapter, 1.0);
+                    } catch (IOException e) {
+                        Log.e(TAG, "Failed to load drawable: " + "starry_night");
+                        e.printStackTrace();
+                }
+                mARRenderer.filter = mImageDetector;
+
+                // Set glSurfaceView
+                glSurfaceView.setRenderer(mARRenderer);
+
+                // mCameraView.setVisibility(SurfaceView.VISIBLE);
+                mCameraView.enableView();
+                ((ViewGroup)findViewById(R.id.preview)).addView(mCameraView);
+                ((ViewGroup)findViewById(R.id.preview)).addView(glSurfaceView);
             }
 
             @Override
@@ -167,7 +153,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
+        if(mCameraView != null) {
+            mCameraView.enableView();
+        }
     }
 
     @Override
@@ -197,9 +185,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         final Mat rgba = inputFrame.rgba();
-        //** Image detector
+        // Image detector
         if(mImageDetector != null) {
-            Log.d(TAG, "Image detecting...");
             mImageDetector.apply(rgba, rgba);
         }
 
