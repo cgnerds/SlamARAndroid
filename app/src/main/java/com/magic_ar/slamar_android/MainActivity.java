@@ -98,6 +98,8 @@ public class MainActivity extends AppCompatActivity
 
                 // mCameraView.setVisibility(SurfaceView.VISIBLE);
                 mCameraView.enableView();
+                mCameraView.setMaxFrameSize(1280, 720);
+                mCameraView.enableFpsMeter();
                 ((ViewGroup)findViewById(R.id.preview)).addView(mCameraView);
                 ((ViewGroup)findViewById(R.id.preview)).addView(glSurfaceView);
             }
