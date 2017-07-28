@@ -17,10 +17,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.JavaCameraView;
-import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
@@ -48,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     // Image Detector
     private ImageDetector mImageDetector;
     // The camera view.
-    private CameraBridgeViewBase mCameraView;
+    private  CameraBridgeViewBase mCameraView;
     // An adapter between the video camera and projection matrix.
     private CameraProjectionAdapter mCameraProjectionAdapter;
     // The renderer for 3D augmentations
@@ -61,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // JavaCameraView
-        mCameraView = new JavaCameraView(this, 0);
+        mCameraView = new MagicCameraView(this, 0); // JavaCameraView
         mCameraView.setCvCameraViewListener(this);
         mCameraView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
@@ -189,7 +186,7 @@ public class MainActivity extends AppCompatActivity
         final Mat rgba = inputFrame.rgba();
         // Image detector
         if(mImageDetector != null) {
-            mImageDetector.apply(rgba, rgba);
+           mImageDetector.apply(rgba, rgba);
         }
 
         return rgba;
