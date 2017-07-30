@@ -47,7 +47,7 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
     private boolean mStopThread;
 
     protected Camera mCamera;
-    protected MagicCameraView.JavaCameraFrame[] mCameraFrame;
+    protected MagicCameraView.MagicCameraFrame[] mCameraFrame;
     private SurfaceTexture mSurfaceTexture;
 
     public static class JavaCameraSizeAccessor implements ListItemAccessor {
@@ -310,7 +310,7 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
             mCamera.addCallbackBuffer(mBuffer);
     }
 
-    private class JavaCameraFrame implements CvCameraViewFrame {
+    private class MagicCameraFrame implements CvCameraViewFrame {
         @Override
         public Mat gray() {
             return mYuvFrameData.submat(0, mHeight, 0, mWidth);
@@ -322,7 +322,7 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
             return mRgba;
         }
 
-        public JavaCameraFrame(Mat Yuv420sp, int width, int height) {
+        public MagicCameraFrame(Mat Yuv420sp, int width, int height) {
             super();
             mWidth = width;
             mHeight = height;
