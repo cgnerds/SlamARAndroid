@@ -201,9 +201,9 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
 
                     AllocateCache();
 
-                    mCameraFrame = new MagicCameraView.JavaCameraFrame[2];
-                    mCameraFrame[0] = new MagicCameraView.JavaCameraFrame(mFrameChain[0], mFrameWidth, mFrameHeight);
-                    mCameraFrame[1] = new MagicCameraView.JavaCameraFrame(mFrameChain[1], mFrameWidth, mFrameHeight);
+                    mCameraFrame = new MagicCameraView.MagicCameraFrame[2];
+                    mCameraFrame[0] = new MagicCameraView.MagicCameraFrame(mFrameChain[0], mFrameWidth, mFrameHeight);
+                    mCameraFrame[1] = new MagicCameraView.MagicCameraFrame(mFrameChain[1], mFrameWidth, mFrameHeight);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                         mSurfaceTexture = new SurfaceTexture(MAGIC_TEXTURE_ID);
