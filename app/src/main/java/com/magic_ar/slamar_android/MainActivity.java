@@ -19,6 +19,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.JavaCameraView;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // JavaCameraView
-        mCameraView = new MagicCameraView(this, 0);
+        mCameraView = new JavaCameraView(this, 0);
         mCameraView.setCvCameraViewListener(this);
         mCameraView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 mARRenderer.filter = mImageDetector;
 
-                // Set glSurfaceView
+            // Set glSurfaceView
                 glSurfaceView.setRenderer(mARRenderer);
 
                 mCameraView.enableView();
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity
                 mCameraView.enableFpsMeter();
                 ((ViewGroup)findViewById(R.id.preview)).addView(mCameraView);
                 ((ViewGroup)findViewById(R.id.preview)).addView(glSurfaceView);
-            }
+        }
 
             @Override
             public void onFailure() {
