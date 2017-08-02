@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity
     // A tag for log output.
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    // OpenCV static initialization
+    // OpenCV static initialization.
     static {
         if(!OpenCVLoader.initDebug())
             Log.d("ERROR", "Unable to load OpenCV");
@@ -43,15 +43,15 @@ public class MainActivity extends AppCompatActivity
             Log.d("SUCCESS", "OpenCV loaded.");
     }
 
-    // Image Detector
+    // Image detector.
     private ImageDetector mImageDetector;
     // The camera view.
     private  CameraBridgeViewBase mCameraView;
     // An adapter between the video camera and projection matrix.
     private CameraProjectionAdapter mCameraProjectionAdapter;
-    // The renderer for 3D augmentations
+    // The renderer for 3D augmentations.
     private ARCubeRenderer mARRenderer;
-    //** TEST
+    // Whether the ImageDetector is running.
     private boolean detectionRunning = false;
 
     @Override
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // JavaCameraView
-        mCameraView = new MagicCameraView(this, 0); // JavaCameraView
+        mCameraView = new MagicCameraView(this, 0);
         mCameraView.setCvCameraViewListener(this);
         mCameraView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity
                 // Set glSurfaceView
                 glSurfaceView.setRenderer(mARRenderer);
 
-                // mCameraView.setVisibility(SurfaceView.VISIBLE);
                 mCameraView.enableView();
                 mCameraView.setMaxFrameSize(1280, 720);
                 mCameraView.enableFpsMeter();
@@ -187,10 +186,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         final Mat rgba = inputFrame.rgba();
-//        // Image detector
-//        if(mImageDetector != null) {
-//           mImageDetector.apply(rgba, rgba);
-//        }
+
         if(!detectionRunning) {
             detectionRunning = true;
             new DetectionTask().execute(rgba);
@@ -214,10 +210,9 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private class DetectionTask extends AsyncTask<Mat, Void, Integer> {
-
+    private class DetectionTask extends AsyncTask<Mat, Void, String> {
         @Override
-        protected Integer doInBackground(Mat... mats) {
+        protected String doInBackground(Mat... mats) {
             // Image detector
             if(mImageDetector != null) {
                 mImageDetector.apply(mats[0], mats[0]);
@@ -226,7 +221,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPostExecute(Integer result) {
+        protected void onPostExecute(String result) {
             detectionRunning = false;
         }
     }
