@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity
     private CameraProjectionAdapter mCameraProjectionAdapter;
     // The renderer for 3D augmentations
     private ARCubeRenderer mARRenderer;
+    //** TEST
+    private boolean detectionRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,9 +187,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         final Mat rgba = inputFrame.rgba();
-        // Image detector
-        if(mImageDetector != null) {
-           mImageDetector.apply(rgba, rgba);
+//        // Image detector
+//        if(mImageDetector != null) {
+//           mImageDetector.apply(rgba, rgba);
+//        }
+        if(!detectionRunning) {
+            detectionRunning = true;
+            new DetectionTask().execute(rgba);
         }
 
         return rgba;
@@ -205,5 +212,22 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class DetectionTask extends AsyncTask<Mat, Void, Integer> {
+
+        @Override
+        protected Integer doInBackground(Mat... mats) {
+            // Image detector
+            if(mImageDetector != null) {
+                mImageDetector.apply(mats[0], mats[0]);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            detectionRunning = false;
+        }
     }
 }
