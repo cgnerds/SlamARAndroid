@@ -147,6 +147,7 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
             try {
                 Camera.Parameters params = mCamera.getParameters();
                 Log.d(TAG, "getSupportedPreviewSizes()");
+                List<int[]> fps = params.getSupportedPreviewFpsRange(); //** For Test
                 List<android.hardware.Camera.Size> sizes = params.getSupportedPreviewSizes();
 
                 if (sizes != null) {
@@ -167,12 +168,8 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
                     }
 
                     //**
-                    // params.set("fast-fps-mode",0);
-                    //
-                    //
-                    // params.setPreviewFrameRate(30);
-                    // params.setPreviewFpsRange(30000, 30000);
-                    // setPreviewFPS(30000, 30000);
+                    //params.set("fast-fps-mode",1);
+                    //params.setPreviewFpsRange(60000, 60000);
                     mCamera.setParameters(params);
                     params = mCamera.getParameters();
 
@@ -342,7 +339,7 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
 
     public void setPreviewFPS(int min ,int max) {
         Camera.Parameters params = mCamera.getParameters();
-        params.set("fast-fps-mode",0);
+        params.set("fast-fps-mode",1);
         //params.setPreviewFpsRange(30000, 30000);
         mCamera.setParameters(params);
         connectCamera(getWidth(), getHeight());
@@ -379,10 +376,4 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
         }
     }
 
-    public void setResolution(Camera.Size resolution) {
-        disconnectCamera();
-        mMaxHeight = resolution.height;
-        mMaxWidth = resolution.width;
-        connectCamera(getWidth(), getHeight());
-    }
 }
