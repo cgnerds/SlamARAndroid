@@ -54,6 +54,9 @@ public class MainActivity extends AppCompatActivity
     private ARCubeRenderer mARRenderer;
     // Whether the ImageDetector is running.
     private boolean detectionRunning = false;
+    // Camera image size
+    private int imageWidth = 1280;
+    private int imageHeight = 720;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity
                 mCameraProjectionAdapter = new CameraProjectionAdapter();
                 Camera camera = Camera.open(0);
                 final Camera.Parameters  parameters = camera.getParameters();
-                final Camera.Size size = camera.new Size(1920,1080); // 1280*720
+                final Camera.Size size = camera.new Size(imageWidth, imageHeight);
                 camera.release();
                 mCameraProjectionAdapter.setCameraParameters(parameters, size);
                 mARRenderer.cameraProjectionAdapter = mCameraProjectionAdapter;
@@ -98,7 +101,7 @@ public class MainActivity extends AppCompatActivity
                 glSurfaceView.setRenderer(mARRenderer);
 
                 mCameraView.enableView();
-                mCameraView.setMaxFrameSize(1920, 1080); //** 1280*720
+                mCameraView.setMaxFrameSize(imageWidth, imageHeight);
                 mCameraView.enableFpsMeter();
                 ((ViewGroup)findViewById(R.id.preview)).addView(mCameraView);
                 ((ViewGroup)findViewById(R.id.preview)).addView(glSurfaceView);
