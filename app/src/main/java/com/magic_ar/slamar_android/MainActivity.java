@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity
                 mCameraProjectionAdapter = new CameraProjectionAdapter();
                 Camera camera = Camera.open(0);
                 final Camera.Parameters  parameters = camera.getParameters();
-                final Camera.Size size = camera.new Size(1280,720);
+                final Camera.Size size = camera.new Size(1920,1080); // 1280*720
                 camera.release();
                 mCameraProjectionAdapter.setCameraParameters(parameters, size);
                 mARRenderer.cameraProjectionAdapter = mCameraProjectionAdapter;
@@ -94,15 +94,15 @@ public class MainActivity extends AppCompatActivity
                 }
                 mARRenderer.filter = mImageDetector;
 
-            // Set glSurfaceView
+                // Set glSurfaceView
                 glSurfaceView.setRenderer(mARRenderer);
 
                 mCameraView.enableView();
-                mCameraView.setMaxFrameSize(1280, 720);
+                mCameraView.setMaxFrameSize(1920, 1080); //** 1280*720
                 mCameraView.enableFpsMeter();
                 ((ViewGroup)findViewById(R.id.preview)).addView(mCameraView);
                 ((ViewGroup)findViewById(R.id.preview)).addView(glSurfaceView);
-        }
+            }
 
             @Override
             public void onFailure() {
