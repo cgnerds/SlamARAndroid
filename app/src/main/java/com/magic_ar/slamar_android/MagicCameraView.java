@@ -47,7 +47,7 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
     private boolean mStopThread;
 
     protected Camera mCamera;
-    protected MagicCameraView.MagicCameraFrame[] mCameraFrame;
+    protected MagicCameraFrame[] mCameraFrame;
     private SurfaceTexture mSurfaceTexture;
 
     public static class JavaCameraSizeAccessor implements ListItemAccessor {
@@ -74,7 +74,7 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
     }
 
     protected boolean initializeCamera( int width, int height) {
-        Log.d(TAG, "Initialize java camera");
+        Log.d(TAG, "Initialize  camera");
         boolean result = true;
         synchronized (this) {
             mCamera = null;
@@ -151,7 +151,7 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
 
                 if (sizes != null) {
                     /* Select the size that fits surface considering maximum size allowed */
-                    Size frameSize = calculateCameraFrameSize(sizes, new MagicCameraView.JavaCameraSizeAccessor(), width, height);
+                    Size frameSize = calculateCameraFrameSize(sizes, new JavaCameraSizeAccessor(), width, height);
 
                     params.setPreviewFormat(ImageFormat.NV21);
                     Log.d(TAG, "Set preview size to " + Integer.valueOf((int)frameSize.width) + "x" + Integer.valueOf((int)frameSize.height));
@@ -172,7 +172,7 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
                     //
                     // params.setPreviewFrameRate(30);
                     // params.setPreviewFpsRange(30000, 30000);
-                    setPreviewFPS(30000, 30000);
+                    // setPreviewFPS(30000, 30000);
                     mCamera.setParameters(params);
                     params = mCamera.getParameters();
 
@@ -201,9 +201,9 @@ public class MagicCameraView extends CameraBridgeViewBase implements PreviewCall
 
                     AllocateCache();
 
-                    mCameraFrame = new MagicCameraView.MagicCameraFrame[2];
-                    mCameraFrame[0] = new MagicCameraView.MagicCameraFrame(mFrameChain[0], mFrameWidth, mFrameHeight);
-                    mCameraFrame[1] = new MagicCameraView.MagicCameraFrame(mFrameChain[1], mFrameWidth, mFrameHeight);
+                    mCameraFrame = new MagicCameraFrame[2];
+                    mCameraFrame[0] = new MagicCameraFrame(mFrameChain[0], mFrameWidth, mFrameHeight);
+                    mCameraFrame[1] = new MagicCameraFrame(mFrameChain[1], mFrameWidth, mFrameHeight);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                         mSurfaceTexture = new SurfaceTexture(MAGIC_TEXTURE_ID);
