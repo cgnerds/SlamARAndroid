@@ -8,13 +8,13 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 
-import static android.opengl.EGL14.EGL_CONTEXT_CLIENT_VERSION;
-
 /**
  * Created by cgnerds on 2017/8/3.
  */
 
 public class GLView extends GLSurfaceView {
+    private HelloAR helloAR;
+
     public GLView(Context context) {
         super(context);
         setEGLContextFactory(new ContextFactory());
