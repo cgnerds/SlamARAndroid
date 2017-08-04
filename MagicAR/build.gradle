@@ -32,12 +32,12 @@ dependencies {
 }
 
 task clearJar(type: Delete) {
-    delete 'build/libs/MagicAR.jar'
+    delete '../app/src/main/libs/MagicAR.jar'
 }
 
 task makeJar(type: Copy) {
     from('build/intermediates/bundles/release/')
-    into('build/libs/')
+    into('../app/src/main/libs/')
     include('classes.jar')
     rename('classes.jar', 'MagicAR.jar')
 }

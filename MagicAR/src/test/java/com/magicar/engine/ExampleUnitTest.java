@@ -1,4 +1,4 @@
-package com.magicar.engine.MagicAR;
+package com.magicar.engine;
 
 import org.junit.Test;
 
