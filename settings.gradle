@@ -1,2 +1,2 @@
-include ':app'
+include ':app', ':MagicAR'
 include ':openCVLibrary320'
