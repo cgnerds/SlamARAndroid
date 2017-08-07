@@ -5,3 +5,5 @@
 
 The Android version of SlamAR. The funcitons are as follows:
 1. Using the ORB method to recognize the targe image and render an cube.
+2. Using the SLAM method to recognize the unknown scenes.
+3. Using VIO method to add IMU support.
