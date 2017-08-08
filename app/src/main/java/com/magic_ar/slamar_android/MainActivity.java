@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 /*
  *  [Android Development with OpenCV](http://docs.opencv.org/2.4/doc/tutorials/introduction/android_binary_package/dev_with_OCV_on_Android.html)
+ *  Change camera to camera2.
  */
 @SuppressWarnings("deprecation")
 public class MainActivity extends AppCompatActivity
