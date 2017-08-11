@@ -20,6 +20,7 @@ public class MagicGLSurfaceView extends GLSurfaceView {
         if(Build.VERSION.SDK_INT >= 21) {
             // mRenderer = new Camera2Renderer(this);
             // mRenderer = new Camera2Renderer(this);
+            // mRenderer = new Camera2Renderer(this);
         }
     }
 }
