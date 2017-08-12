@@ -21,6 +21,7 @@ public class MagicGLSurfaceView extends GLSurfaceView {
             // mRenderer = new Camera2Renderer(this);
             // mRenderer = new Camera2Renderer(this);
             // mRenderer = new Camera2Renderer(this);
+            // mRenderer = new Camera2Renderer(this);
         }
     }
 }
