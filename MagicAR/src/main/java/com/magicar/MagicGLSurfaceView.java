@@ -5,7 +5,6 @@ import android.opengl.GLSurfaceView;
 import android.os.Build;
 
 import org.opencv.android.Camera2Renderer;
-import org.opencv.android.CameraGLSurfaceView;
 
 /**
  * Created by 38325 on 2017/8/9.
