@@ -12,4 +12,5 @@ public abstract class MagicGLRendererBase implements GLSurfaceView.Renderer, Sur
     protected final String TAG = "MagicGLRendererBase";
 
     protected SurfaceTexture mSTex;
+    // protected SurfaceTexture mSTex;
 }
