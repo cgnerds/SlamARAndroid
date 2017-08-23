@@ -1,5 +1,6 @@
-package com.magicar.engine;
+package com.magic_ar.slamar_android;
 
+import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -43,6 +44,7 @@ public class IMU implements SensorEventListener{
 
     public void create()
     {
+        // mSensorManager
 
     }
 
