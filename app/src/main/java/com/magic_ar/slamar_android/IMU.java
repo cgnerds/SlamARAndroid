@@ -44,8 +44,6 @@ public class IMU implements SensorEventListener{
 
     public void create()
     {
-        // mSensorManager
-
     }
 
     @Override
