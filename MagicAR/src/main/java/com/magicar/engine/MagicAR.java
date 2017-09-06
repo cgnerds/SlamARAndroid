@@ -6,4 +6,5 @@ package com.magicar.engine;
 
 public class MagicAR {
   // The main class that includes many core implementation.
+  int CameraID;
 }
