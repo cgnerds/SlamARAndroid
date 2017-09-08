@@ -14,5 +14,5 @@ public abstract class MagicGLRendererBase implements GLSurfaceView.Renderer, Sur
     protected SurfaceTexture mSTex;
     // protected SurfaceTexture mSTex;
     private int textureID;
-    private string vertexShader;
+    private String vertexShader;
 }
